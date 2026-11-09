@@ -30,6 +30,7 @@ s=s.replace('<title>Орбита · интерактивное демо</title>'
 s=s.replace('[t,l]=(0,B.useState)(gf)','[t,l]=(0,B.useState)(OBH_demoData)')
 s=s.replace('o(!0),l(gf()),p(null)','o(!0),l(OBH_demoData()),p(null)')
 s=s.replace('if(x.log=[{id:vn(),text:T,at:new Date().toISOString()},...x.log].slice(0,100),u)return l(x),L(T+" \\xB7 демо"),!0;', 'if(x.log=[{id:vn(),text:T,at:new Date().toISOString()},...x.log].slice(0,100),u){try{OBH_saveDemo(x);return l(x),L(T+" · сохранено в демосети этого браузера"),!0;}catch(err){return c(err.message),!1;}}')
+s=s.replace('value:t.profiles.length','value:(0,d.jsx)(OrbitaPeopleCount,{data:t})')
 (p/'dist/index.html').write_text(s)
 for f in ['Orbita_TZ.html','specification.html']:
  (p/'dist'/f).unlink(missing_ok=True)

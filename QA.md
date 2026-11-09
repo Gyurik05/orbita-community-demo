@@ -40,3 +40,7 @@
 - Scenario component tests: profile matching, empty-profile navigation, withdrawal preserving empty scenario, rejoin PASS.
 - Local headless browser stage NOT RUN: environment prevents Chromium's process-singleton socket; local HTTP was not reachable by the connected browser. Publication browser checks follow separately.
 - No backend, account, external delivery or Kodik integration test is claimed.
+- Published browser run at 0f460f5: first-screen role benefits, full GR 15-step flow, consent guard, optional photo skip, save → coordinator approval → community participant catalogue PASS. Exact fictional email/private request absent from catalogue DOM. Reload persistence and consent withdrawal hiding card PASS.
+- Published map expert filter shows exactly its two demonstration relations. Calendar creation, RSVP, invitation preview and reload persistence PASS. Discussion vote/withdrawal and comment/reload persistence PASS.
+- Independent audit identified and fixed three edge cases before final revision: corrupted event/discussion storage now blocks ordinary writes until explicit recovery; photo stored once in the form store instead of duplicated in workflow storage; membership status separated from moderation status. Overview participant count now includes approved GR cards.
+- Published browser: all six sections / 21 leader questions, required-answer guard, final save into coordinator queue and accepting the record PASS. Scenario personalized feed, confirmed community withdrawal, persisted removal after reload and rejoin PASS.
