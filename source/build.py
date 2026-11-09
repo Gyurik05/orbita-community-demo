@@ -30,7 +30,7 @@ s=s.replace('До подтверждения обмена ресурсы не п
 art='<div class="ob-orbit-art"><img src="assets/orbita-communities-orbit.png" alt="Ядро платформы — связь и инструменты; вокруг него на орбитах четыре самостоятельных сообщества" width="1536" height="1024" fetchpriority="high" /></div>'
 s,n=re.subn(r'\(0,d.jsx\)\("img",\{className:"hero-render",src:"data:image/[^\"]+",alt:"[^\"]+",fetchPriority:"high"\}\)', lambda m: '(0,d.jsx)("div",{dangerouslySetInnerHTML:{__html:'+json.dumps(art)+'}})',s);assert n==1,n
 # Preserve the approved original subtitle and make its meaning explicit again.
-s=s.replace('Каждое сообщество создаёт свой инструмент','Каждое сообщество сохраняет самостоятельность. ').replace('или берёт инструмент другого сообщества.','Знания, связи и инструменты работают вместе.')
+s=s.replace('children:["Каждое сообщество создаёт свой инструмент",','children:["Каждое сообщество сохраняет самостоятельность. ",').replace('или берёт инструмент другого сообщества.','Знания, связи и инструменты работают вместе.')
 # Add neutral map taxonomy note; no claim to actual data flow.
 s=s.replace('e==="map"&&(0,d.jsxs)("section",','e==="map"&&(0,d.jsx)("div",{className:"ob-legend",children:"Связи показывают совместные сценарии, не передачу данных. Экспертные · проектные · образовательные · деловые; прочие типы согласуем на пилоте."}),e==="map"&&(0,d.jsxs)("section",',1)
 s=s.replace('В приложении нет обязательных полей имени, телефона или личной переписки. Не добавляйте личные контакты в описания и названия.','В демонстрационных анкетах используйте вымышленные сведения. E-mail и запрос участника исключены из публичного предпросмотра. Реальные данные здесь не собираем.')
