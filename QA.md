@@ -47,3 +47,19 @@
 - Final Pages 94de8ed browser: personalized event filter PASS. Mobile iframe 390px / actual content 375px: calendar, map and personal area have scrollWidth = clientWidth = 375; actual AX menu navigation PASS. Locator clicks in iframe were unreliable, so actual accessibility clicks verified navigation.
 - Downloaded public-catalog JSON parsed successfully; downloaded .ics UTC timestamps correctly convert 18:00 America/Toronto to 23:00Z. No application-origin runtime errors observed; browser extension telemetry errors excluded.
 - Final regression fixed: leader record visible in My saved records even when participant list is empty (previously remained available in coordinator queue). Added focused test.
+
+## Revision 2026-11-09-v3 · two public areas
+- Supersedes the earlier user-surface cleanup: restored the requested public development, participation tasks, recognition and roadmap routes. Exactly two main groups, six sections each, appear after Overview. Personal utilities remain below them.
+- Removed the four-route redirect in user_surface.py for click navigation, initial deep links and Back/Forward listeners. Repeated navigation to the same hash no longer creates duplicate history entries; navigating closes a previous modal.
+- Public roadmap is a separate component and never consumes the historical private data.tasks, owners, deadlines or meeting protocol. The private data export exclusion remains unchanged.
+- Tasks are suggested participation/testing/content activities. Choosing/withdrawing is browser-local only. Recognition states that no verified contributions exist; local task choices are not achievements. Results require a nonempty outcome and remain labelled as unverified demo examples.
+- Build, Python compile, generated JS parse and component source parse: PASS.
+- tests/navigation.cjs: PASS for exact two-by-six menu and route actions, active aria-current, all four new platform pages, roadmap boundary, local task persistence/withdrawal, denied writes, corrupt and malformed storage protection, result filtering, history/deep-link guards.
+- Existing tests/workflows.cjs: PASS. Corrected its source paths to resolve relative to the test file, so invocation works from either parent or source directory.
+- Real browser run of this revision: NOT RUN. Chromium launch failed before opening the page due to process-singleton socket restrictions, including an escalation attempt. Component/structural checks do not establish visual layout or real browser history behavior. Final integrated browser QA remains required.
+
+## Integrated revision 2026-11-09-v3
+- Original landing composition and subtitle retained. New generated static art depicts a platform core and four orbiting communities without the checkmark.
+- Map uses six named relation types, with count labels and full community-node names. Filters and CRUD retain obsolete local records without destructive migration.
+- Integrated build, Python compilation, exact generated JavaScript parse, navigation tests, map tests and existing workflow tests: PASS.
+- Source and deploy artifact are published together; prior QA entries refer to their named revisions, not an automatic browser pass for v3.

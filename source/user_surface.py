@@ -1,8 +1,7 @@
+# Public platform sections stay reachable; private historical tasks remain excluded from exports.
 from pathlib import Path
 p=Path(__file__).parent
 s=(p/'dist/index.html').read_text()
-s=s.replace('function D(x){a(x)', 'function D(x){if(["plan","development","platform-tasks","recognition"].includes(x))x="overview";a(x)')
-s=s.replace('xf.some(T=>T.id===x)&&a(x)','xf.some(T=>T.id===x)&&a(["plan","development","platform-tasks","recognition"].includes(x)?"overview":x)')
 a=s.index('{label:"Движение к 15 декабря"');b=s.index('}].map',a)
 s=s[:a]+'{label:"Участники и специалисты",value:t.profiles.length,sub:"Добровольные профили",icon:pt,color:"orange",to:"profiles"'+s[b:]
 a=s.index('(0,d.jsxs)("section",{className:"glass meeting-card"');b=s.index('(0,d.jsxs)("section",{className:"glass needs-card"',a)
@@ -15,9 +14,10 @@ s=s.replace('каталог сети, сценарии, профили и пла
 s=s.replace('(0,d.jsxs)("button",{className:"primary",onClick:t,children:[(0,d.jsx)(Ml,{size:16}),"Техническое задание"]})','null')
 s=s.replace('Отправить анкету','Сохранить анкету локально').replace('Анкета попадёт в список сообществ','Анкета сохранится в этом браузере в списке сообществ')
 s=s.replace('children:"Опубликовать"','children:"Сохранить профиль локально"').replace('Профиль опубликован с согласия участника','Профиль сохранён локально с согласием участника')
-s=s.replace('Лаборатория инструментов','Инструменты сообществ').replace('Наша роль','Условия использования').replace('Дать понятные правила совместимости и помочь конструкторам им следовать. Платформа, язык и конструктор инструментов не предписаны исходным планом. Общий граф профилей требует добровольного согласия и просмотра каждым человеком.','Перед использованием уточните условия у владельца инструмента. Не передавайте закрытые данные без разрешения. Добавление описания в каталог не подключает внешние системы.')
-s=s.replace('window.history.replaceState(null,"","#"+x)','window.history.pushState(null,"","#"+x)')
-s=s.replace('function D(x){','(0,B.useEffect)(()=>{const sync=()=>{let id=window.location.hash.slice(1)||"overview";if(["plan","development","platform-tasks","recognition"].includes(id)||!xf.some(v=>v.id===id))id="overview";a(id);p(null);b(!1);};window.addEventListener("popstate",sync);window.addEventListener("hashchange",sync);return()=>{window.removeEventListener("popstate",sync);window.removeEventListener("hashchange",sync);};},[]);function D(x){')
+s=s.replace('Наша роль','Условия использования').replace('Дать понятные правила совместимости и помочь конструкторам им следовать. Платформа, язык и конструктор инструментов не предписаны исходным планом. Общий граф профилей требует добровольного согласия и просмотра каждым человеком.','Перед использованием уточните условия у владельца инструмента. Не передавайте закрытые данные без разрешения. Добавление описания в каталог не подключает внешние системы.')
+s=s.replace('tools:["Инструменты сообществ",','tools:["Лаборатория инструментов",')
+s=s.replace('window.history.replaceState(null,"","#"+x)','window.location.hash!=="#"+x&&window.history.pushState(null,"","#"+x)')
+s=s.replace('function D(x){','(0,B.useEffect)(()=>{const sync=()=>{let id=window.location.hash.slice(1)||"overview";if(!xf.some(v=>v.id===id))id="overview";a(id);p(null);b(!1);};window.addEventListener("popstate",sync);window.addEventListener("hashchange",sync);return()=>{window.removeEventListener("popstate",sync);window.removeEventListener("hashchange",sync);};},[]);function D(x){p(null);')
 s=s.replace('meeting:O.enum(["2026-11-19","2026-11-20"])','meeting:O.enum(["","2026-11-19","2026-11-20"])')
 s=s.replace('(0,d.jsx)("section",{className:"stats-grid"','(0,d.jsx)(OrbitaRoleIntro,{onNavigate:D}),(0,d.jsx)("section",{className:"stats-grid"',1)
 s=s.replace('подключены к сети','в демосети').replace('Координатор сети','Демонстрация ролей')
@@ -26,7 +26,7 @@ s=s.replace('to:"profiles"','to:"communities"')
 s=s.replace('children:"Связи рождаются из совместных сценариев"','children:"Условные связи демосети. Типы и фильтры доступны на полной карте."')
 s=s.replace('Подтверждённых событий пока нет.','Создавайте демособытия, сохраняйте приглашения и проверяйте участие.')
 s=s.replace('e==="profiles"','e==="profiles"')
-s=s.replace('<title>Орбита · интерактивное демо</title>','<title>Орбита · сообщества и сотрудничество</title><meta name="orbita-release" content="2026-11-09-v2">')
+s=s.replace('<title>Орбита · интерактивное демо</title>','<title>Орбита · сообщества и сотрудничество</title><meta name="orbita-release" content="2026-11-09-v3">')
 s=s.replace('[t,l]=(0,B.useState)(gf)','[t,l]=(0,B.useState)(OBH_demoData)')
 s=s.replace('o(!0),l(gf()),p(null)','o(!0),l(OBH_demoData()),p(null)')
 s=s.replace('if(x.log=[{id:vn(),text:T,at:new Date().toISOString()},...x.log].slice(0,100),u)return l(x),L(T+" \\xB7 демо"),!0;', 'if(x.log=[{id:vn(),text:T,at:new Date().toISOString()},...x.log].slice(0,100),u){try{OBH_saveDemo(x);return l(x),L(T+" · сохранено в демосети этого браузера"),!0;}catch(err){return c(err.message),!1;}}')
