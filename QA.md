@@ -63,3 +63,12 @@
 - Map uses six named relation types, with count labels and full community-node names. Filters and CRUD retain obsolete local records without destructive migration.
 - Integrated build, Python compilation, exact generated JavaScript parse, navigation tests, map tests and existing workflow tests: PASS.
 - Source and deploy artifact are published together; prior QA entries refer to their named revisions, not an automatic browser pass for v3.
+
+### Published v3 browser verification
+- Commit cc80cc57b847b64f4eaa55be34df7e70f06793fd: main readback matches all 21 manifest files. Pages run 42707097634 completed successfully.
+- Connected Chrome: new hero image loaded at 1536x1024; original subtitle emphasized; exactly two navigation groups, six buttons each. All 12 sections render and survive reload. Back/Forward between platform routes PASS.
+- Expert filter: two demo links; focusing Education community: one matching expert link. Six named community nodes and six relation types confirmed. Create fictional strategic relation, reload persistence, edit, delete and reload absence PASS. No real data used.
+- Platform task selection persists after reload; withdrawal works. Test selection and test relation were removed.
+- Mobile iframe width 390 px (375 px content): hero and map body scrollWidth/clientWidth both 375. Hero image 341x227 px. Map scrolling remains contained in its 309 px diagram viewport with a 640 px SVG. Actual menu opening and overview/map navigation PASS. This is a responsive iframe test, not physical-device coverage.
+- Final one-character correction adds a space between the two subtitle sentences when mobile CSS hides their line break. The static image remains non-animated.
+- Browser exact-label lookup for the community select required the known CSS selector; the native select worked. Earlier local Chromium failures do not invalidate this separate published-browser run. No backend, account, external-delivery or Kodik tests are claimed.
