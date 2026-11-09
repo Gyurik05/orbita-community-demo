@@ -25,10 +25,9 @@ s=s.replace('Правила взаимного обмена подтвержде
 s=s.replace('Взаимный доступ по соглашению','Добровольный доступ по соглашению')
 s=s.replace('Каждое сообщество само открывает свой доступ в обмен на доступ соседей. Правила фиксируются письменно до подключения. Отметка в прототипе не заменяет соглашение и не открывает API.','Участие не требует раскрытия базы. Сообщество отдельно выбирает, какие ресурсы открыть и кому. Обмен согласуется отдельно. Отметка в прототипе не открывает API.')
 s=s.replace('До подтверждения обмена ресурсы не появятся на карте сети.','Участие в сети не обязывает открывать данные. Доступы согласуются отдельно.')
-# Restore the original landing composition with a shared core and orbiting communities.
-# Keep the other page and workflow updates intact; no checkmark or bank-like badge.
-art='<div class="ob-orbit-art"><img src="assets/orbita-communities-orbit.png" alt="Ядро платформы — связь и инструменты; вокруг него на орбитах четыре самостоятельных сообщества" width="1536" height="1024" fetchpriority="high" /></div>'
-s,n=re.subn(r'\(0,d.jsx\)\("img",\{className:"hero-render",src:"data:image/[^\"]+",alt:"[^\"]+",fetchPriority:"high"\}\)', lambda m: '(0,d.jsx)("div",{dangerouslySetInnerHTML:{__html:'+json.dumps(art)+'}})',s);assert n==1,n
+# Restore the original hero element and its original layout, changing only the image URL.
+# The original artwork is retained, with the front-right checkmark badge removed.
+s,n=re.subn(r'(className:"hero-render",src:")data:image/[^\"]+(",alt:)',lambda m:m[1]+'assets/orbita-original-without-checkmark.png'+m[2],s);assert n==1,n
 # Preserve the approved original subtitle and make its meaning explicit again.
 s=s.replace('children:["Каждое сообщество создаёт свой инструмент",','children:["Каждое сообщество сохраняет самостоятельность. ",').replace('или берёт инструмент другого сообщества.','Знания, связи и инструменты работают вместе.')
 # Add neutral map taxonomy note; no claim to actual data flow.
