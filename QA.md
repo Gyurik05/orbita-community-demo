@@ -1,0 +1,32 @@
+# Verification 2026-11-09
+- node --check bundle-check.js: PASS.
+- Synthetic form component checks: 8 PASS (not integration tests).
+- Actual Chrome UI through cua: overview, scenarios, join existing community, personal area, leader questionnaire draft with reload restore, all 15 participant steps with consent guard and optional photo skip, save, public preview (email/request absent), reload restore of saved participant name.
+- Actual clicks through 11 other navigation sections: rendered headings verified, no blank screen.
+- Mobile rendering at 390px iframe viewport (375px content with scrollbar): scenarios and leader form have body scrollWidth=clientWidth=375. Actual AX clicks open menu and navigate personal area then leader questionnaire.
+- Initial Unicode decoding browser error fixed by limiting decoding to Cyrillic only, then bundle reloaded successfully.
+- Full production integrations, Telegram, authentication, role isolation, real databases not implemented or tested. No real accounts or invitations. Full 21-answer end-to-end completion tested synthetically, not via browser.
+
+## Hero variant 04
+- Clean transparent glass ribbon generated from selected reference 04, no text or neighbouring symbols.
+- Actual Chrome desktop render and scenario navigation PASS.
+- Mobile iframe 390px: content width 375px, scrollWidth 375px; hero image 341x180, fully visible below copy.
+- Only image/build/CSS changed; forms and data flow retained.
+
+## User-facing surface cleanup
+- Removed internal development/task/roadmap/recognition navigation; old internal deep links guarded.
+- Removed build deadline, progress KPI, internal meeting agenda and downloadable historic specifications from deployed assets.
+- Retained community tools, user feedback, events (honest empty state), profiles/forms/scenarios.
+- Local data preserved; user export omits internal tasks/log/meeting.
+- Actual Chrome clicks through 11 routes: no internal roadmap/task/TZ markers. Reload #plan gives overview; leader questionnaire opens. node --check PASS.
+
+## Functional retest 2026-11-09 (fictional data, local preview)
+- Community request: entered name/description, saved in browser, refreshed and confirmed card persisted; explicit participation consent enabled connection without requiring data exchange.
+- Scenario: created, joined existing local community, refreshed and confirmed membership; repeated joining showed all available communities already participate. Edited status to Ready and confirmed result page.
+- Feedback: saved fictional idea, refreshed and confirmed persistence.
+- Tool catalogue: saved fictional tool with example.org URL and conditions; refreshed and confirmed persistence.
+- Profile: form validation and consent/preview reached; final save browser action blocked by tool approval policy, so final profile save NOT counted as passed in this retest. Source handler is localStorage only; renamed confusing Publish label to Save locally.
+- Leader: independent real-browser QA confirmed empty q1 blocked, draft reload, max5 cap, Other explanation required, all21 completion/summary, and no-data-sharing choice preserved.
+- No actual external invitations, CRM/database writes or submissions are implemented or claimed.
+- GR independent browser QA: 15 steps, consent gate, invalid Telegram/email rejected, optional photo skipped, Other guard; full summary includes explanation, public preview includes public topic explanation but excludes private request explanation and email. Saving without publish consent keeps closed preview; no outbound submission.
+- Fixed navigation history: real browser Back and #events navigation both PASS after adding popstate/hashchange handling.
