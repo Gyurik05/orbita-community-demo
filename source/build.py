@@ -5,12 +5,12 @@ p=Path(__file__).parent;s=(p/'baseline/repo-index.html').read_text();s=re.sub(r'
 newids={'resources':'Запросы и ресурсы','events':'События и встречи','results':'Результаты сотрудничества','development':'Развитие Орбиты','ideas':'Идеи и предложения','platform-tasks':'Задачи платформы','recognition':'Вклад и признание','personal':'Моё пространство','participant':'Визитка участника GR','legacy-survey':'Добавить сообщество'}
 import json
 add=';xf.push(...'+json.dumps([{'id':i,'title':v} for i,v in newids.items()],ensure_ascii=False)+');'
-components='\n'.join((p/f).read_text() for f in ['forms.js','scenarios.js','extra.js'])
+components='\n'.join((p/f).read_text() for f in ['hub.js','forms.js','scenarios.js','network.js','communities.js','collaboration.js','extra.js'])
 s=s.replace('function vf(){',add+components+'\nfunction vf(){',1)
 a=s.index('(0,d.jsx)("nav",{children:xf.map');b=s.index('(0,d.jsxs)("div",{className:"sidebar-bottom"',a);s=s[:a]+'(0,d.jsx)(OrbitaNav,{view:e,onNavigate:D}),'+s[b:]
-custom=['survey','participant','personal','resources','events','results','development','ideas','platform-tasks','recognition','scenarios']
+custom=['map','communities','profiles','survey','participant','personal','resources','events','results','development','ideas','platform-tasks','recognition','scenarios']
 needle='e==="overview"?(0,d.jsxs)(d.Fragment'
-s=s.replace(needle,json.dumps(custom)+' .includes(e)?(0,d.jsx)(OrbitaExtra,{view:e,data:t,onSave:q,onNavigate:D,onOpen:id=>p({type:"scenario",id})}):'+needle,1)
+s=s.replace(needle,json.dumps(custom)+' .includes(e)?(0,d.jsx)(OrbitaExtra,{view:e,data:t,onSave:q,onNavigate:D,onOpen:id=>p({type:"scenario",id}),onOpenCommunity:id=>p({type:"community",id})}):'+needle,1)
 # Keep old community creation form reachable from catalogue; new leader form in personal area.
 s=s.replace('e==="survey"&&(0,d.jsx)(dC','e==="legacy-survey"&&(0,d.jsx)(dC')
 s=s.replace('D("survey")','D("legacy-survey")')

@@ -30,3 +30,13 @@
 - No actual external invitations, CRM/database writes or submissions are implemented or claimed.
 - GR independent browser QA: 15 steps, consent gate, invalid Telegram/email rejected, optional photo skipped, Other guard; full summary includes explanation, public preview includes public topic explanation but excludes private request explanation and email. Saving without publish consent keeps closed preview; no outbound submission.
 - Fixed navigation history: real browser Back and #events navigation both PASS after adding popstate/hashchange handling.
+
+## Revision 2026-11-09-v2
+- Syntax: exact generated JS bundle and all new components PASS.
+- Workflow unit tests: queue creation, approval + consent gating, private-field allowlist, withdrawal, deletion, role/tab render, corrupted-storage write blocking PASS.
+- Map component tests: eight types, filters, CRUD, write failure and corrupt-store guard PASS.
+- Community component tests: three tabs, search, consenting approved cards only, private-field exclusion PASS.
+- Calendar/discussion component tests: render, RSVP, cancellation, local-to-UTC ICS, vote/withdrawal, comments, corrupt-storage recovery PASS.
+- Scenario component tests: profile matching, empty-profile navigation, withdrawal preserving empty scenario, rejoin PASS.
+- Local headless browser stage NOT RUN: environment prevents Chromium's process-singleton socket; local HTTP was not reachable by the connected browser. Publication browser checks follow separately.
+- No backend, account, external delivery or Kodik integration test is claimed.

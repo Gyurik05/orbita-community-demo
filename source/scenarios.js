@@ -2,6 +2,8 @@ function OrbitaScenarios({data,onSave,onOpen,onNavigate}) {
   const h = B.createElement;
   const [query,setQuery] = B.useState("");
   const [filter,setFilter] = B.useState("all");
+  const [feed,setFeed] = B.useState("all");
+  const [leaving,setLeaving] = B.useState(false);
   const [joining,setJoining] = B.useState(null);
   const [community,setCommunity] = B.useState("");
   const [busy,setBusy] = B.useState(false);
@@ -18,21 +20,27 @@ function OrbitaScenarios({data,onSave,onOpen,onNavigate}) {
   };
   const ready = scenarios.filter(s=>s.stage === "ready" && String(s.result||"").trim());
   const inCooperation = new Set(scenarios.filter(s=>(s.communityIds||[]).length>1).flatMap(s=>s.communityIds).filter(id=>communities.some(c=>c.id===id)));
-  const visible = scenarios.filter(s=>(filter==="all"||s.stage===filter) && [s.title,s.description,s.result,...(s.communityIds||[]).map(id=>communities.find(c=>c.id===id)?.name||"")].join(" ").toLocaleLowerCase("ru").includes(query.toLocaleLowerCase("ru")));
+  let profile = null;
+  try { profile = (window.OrbitaHub?.read()?.cards || []).find(c=>c.id==="local-participant") || null; } catch (_) { /* The local profile may not be available yet. */ }
+  const words = value => (Array.isArray(value)?value.join(" "):String(value||"")).toLocaleLowerCase("ru").split(/[^\p{L}\p{N}]+/u).filter(w=>w.length>2);
+  const profileWords = [...new Set([...words(profile?.topics),...words(profile?.contribution)])];
+  const hasProfile = !!profile && (!!profile.communityId || profileWords.length>0);
+  const matchesProfile = s => hasProfile && ((s.communityIds||[]).includes(profile.communityId) || profileWords.some(w=>[s.title,s.description,s.result,...(s.topics||[])].join(" ").toLocaleLowerCase("ru").includes(w)));
+  const visible = scenarios.filter(s=>(feed==="all"||matchesProfile(s)) && (filter==="all"||s.stage===filter) && [s.title,s.description,s.result,...(s.communityIds||[]).map(id=>communities.find(c=>c.id===id)?.name||"")].join(" ").toLocaleLowerCase("ru").includes(query.toLocaleLowerCase("ru")));
   const selected = scenarios.find(s=>s.id===joining);
-  const choices = selected ? communities.filter(c=>c.status!=="disconnected" && !(selected.communityIds||[]).includes(c.id)) : [];
+  const choices = selected ? communities.filter(c=>leaving ? (selected.communityIds||[]).includes(c.id) : c.status!=="disconnected" && !(selected.communityIds||[]).includes(c.id)) : [];
   B.useEffect(()=>{if(!joining)return;const close=e=>{if(e.key==="Escape"&&!lock.current)setJoining(null)};document.addEventListener("keydown",close);return()=>document.removeEventListener("keydown",close)},[joining]);
   async function join(e) {
     e.preventDefault();
     if(lock.current||!selected||!community)return;
     const current=scenarios.find(s=>s.id===selected.id);
-    if(!current||current.communityIds.includes(community)){setJoining(null);return;}
+    if(!current){setError("Сценарий больше не доступен. Закройте окно и обновите список.");return;}
     if(!choices.some(c=>c.id===community)){setError("Выберите доступное сообщество");return;}
     lock.current=true;setBusy(true);setError("");
     try {
-      const updated={...data,scenarios:scenarios.map(s=>s.id===current.id?{...s,communityIds:[...s.communityIds,community]}:s)};
-      const ok=await onSave(updated,"Сообщество присоединилось к сценарию в прототипе");
-      if(ok){setJoining(null);setCommunity("");setNotice("Участие добавлено в прототипе. Приглашения не отправлялись, доступ к данным не открывался.");}
+      const updated={...data,scenarios:scenarios.map(s=>s.id===current.id?{...s,communityIds:leaving?(s.communityIds||[]).filter(id=>id!==community):[...new Set([...(s.communityIds||[]),community])]}:s)};
+      const ok=await onSave(updated,leaving?"Участие сообщества отозвано в прототипе":"Сообщество присоединилось к сценарию в прототипе");
+      if(ok){setJoining(null);setCommunity("");setNotice(leaving?"Участие отозвано только в прототипе. Сценарий сохранён, присоединиться снова можно в любой момент. Внешние уведомления не отправлялись.":"Участие добавлено в прототипе. Приглашения не отправлялись, доступ к данным не открывался.");}
       else setError("Не удалось сохранить участие. Проверьте сообщение об ошибке и повторите.");
     } catch(e) {setError(e instanceof Error?e.message:"Не удалось сохранить участие");}
     finally {lock.current=false;setBusy(false);}
@@ -50,6 +58,8 @@ function OrbitaScenarios({data,onSave,onOpen,onNavigate}) {
     ].map(([n,title])=>h("div",{className:"ob-sc-kpi",key:title},h("strong",null,n),h("span",null,title)))),
     h("p",{className:"ob-sc-note"},"Учебный прототип. Показатели рассчитаны по карточкам текущего режима. Статус «Готово» означает запись результата, а не независимое подтверждение внедрения."),
     notice&&h("div",{className:"ob-sc-callout",role:"status"},notice),
+    h("div",{className:"ob-sc-tabs","aria-label":"Лента сценариев"},[["all","Вся лента"],["profile","По моему профилю"]].map(([id,title])=>h("button",{key:id,className:"ob-sc-tab","aria-pressed":feed===id,onClick:()=>setFeed(id)},title))),
+    feed==="profile"&&h("p",{className:"ob-sc-note"},"Локальный подбор по сообществу, темам и вкладу из вашей визитки. Совпадение слов не означает приглашение или подписку."),
     h("div",{className:"ob-sc-toolbar"},h("div",{className:"ob-sc-tabs","aria-label":"Статус сценария"},[["all","Все сценарии"],["idea","Ищем партнёров"],["agreed","Согласовано"],["building","В работе"],["ready","Готово"]].map(([id,title])=>h("button",{key:id,className:"ob-sc-tab","aria-pressed":filter===id,onClick:()=>setFilter(id)},title))),h("input",{className:"ob-sc-search",type:"search",value:query,onChange:e=>setQuery(e.target.value),placeholder:"Найти сценарий или сообщество","aria-label":"Поиск совместных сценариев"})),
     h("div",{className:"ob-sc-grid"},visible.map((s,index)=>{
       const participants=(s.communityIds||[]).map(id=>communities.find(c=>c.id===id)).filter(Boolean);
@@ -61,16 +71,16 @@ function OrbitaScenarios({data,onSave,onOpen,onNavigate}) {
           h("dl",null,
             h("div",null,h("dt",null,"Ресурсы сообществ · заявлены"),h("dd",null,resources.length?resources.join(" · "):"Участники ещё не согласовали ресурсы")),
             h("div",null,h("dt",null,s.stage==="ready"?"Записанный результат":"Ожидаемый результат"),h("dd",null,s.result||"Уточнить вместе с партнёрами")),
-            h("div",null,h("dt",null,"Следующий шаг · ориентир"),h("dd",null,state.next)),
+            h("div",null,h("dt",null,"Следующий шаг · ориентир"),h("dd",null,participants.length?state.next:"Пригласить первое сообщество к обсуждению; карточка сохранена")),
             h("div",null,h("dt",null,"Ответственный"),h("dd",null,s.owner||"Пока не назначен"))
           ),
           h("div",{className:"ob-sc-bottom"},h("span",{className:"ob-sc-status"},state.label),s.due&&h("time",{dateTime:s.due},"Срок: "+new Intl.DateTimeFormat("ru-RU",{day:"numeric",month:"short",timeZone:"UTC"}).format(new Date(s.due)))),
-          h("div",{className:"ob-sc-actions"},h("button",{className:"ob-sc-primary",onClick:()=>{setJoining(s.id);setCommunity("");setError("")}},"Присоединиться к сценарию"),h("button",{className:"ob-sc-secondary",onClick:()=>onOpen(s.id)},"Подробнее / изменить"))
+          h("div",{className:"ob-sc-actions"},h("button",{className:"ob-sc-primary",onClick:()=>{setLeaving(false);setJoining(s.id);setCommunity("");setError("")}},"Присоединиться к сценарию"),participants.length>0&&h("button",{className:"ob-sc-secondary",onClick:()=>{setLeaving(true);setJoining(s.id);setCommunity("");setError("")}},"Выйти из сценария"),h("button",{className:"ob-sc-secondary",onClick:()=>onOpen(s.id)},"Подробнее / изменить"))
         )
       );
     })),
-    !visible.length&&h("div",{className:"ob-sc-empty"},h("h2",null,"Пока нет подходящих сценариев"),h("p",null,"Измените поиск или предложите инициативу, к которой смогут присоединиться другие сообщества."),h("button",{className:"ob-sc-secondary",onClick:()=>{setQuery("");setFilter("all")}},"Сбросить фильтры")),
+    !visible.length&&h("div",{className:"ob-sc-empty"},h("h2",null,feed==="profile"&&!hasProfile?"Заполните профиль для подбора":"Пока нет подходящих сценариев"),h("p",null,feed==="profile"&&!hasProfile?"Укажите сообщество, темы или вклад в своей визитке. Вся лента доступна без профиля.":"Измените поиск, откройте всю ленту или предложите свою инициативу."),feed==="profile"&&!hasProfile&&h("button",{className:"ob-sc-primary",onClick:()=>onNavigate("participant")},"Заполнить профиль"),h("button",{className:"ob-sc-secondary",onClick:()=>{setQuery("");setFilter("all");setFeed("all")}},"Сбросить фильтры")),
     h("p",{className:"ob-sc-bottomline"},h("strong",null,"Запрос → Партнёр → Сценарий → Результат. "),"Заявленные ресурсы не означают открытый доступ к базам. Участие в инициативе не меняет согласия и настройки доступа."),
-    selected&&h("div",{className:"ob-sc-dialog-back",onClick:e=>{if(e.target===e.currentTarget&&!busy)setJoining(null)}},h("section",{className:"ob-sc-dialog",role:"dialog","aria-modal":true,"aria-labelledby":"ob-join-title"},h("h2",{id:"ob-join-title"},"Присоединиться к сценарию"),h("p",null,selected.title),h("p",null,"В прототипе добавим выбранное сообщество к карточке. Это не отправляет приглашение и не открывает доступ к данным."),h("form",{onSubmit:join},choices.length?h("label",null,"Сообщество",h("select",{value:community,onChange:e=>setCommunity(e.target.value),required:true,disabled:busy,autoFocus:true},h("option",{value:""},"Выберите сообщество"),choices.map(c=>h("option",{key:c.id,value:c.id},c.name)))):h("p",null,"Все доступные сообщества уже участвуют. Можно сначала добавить другое сообщество."),error&&h("p",{role:"alert",className:"ob-sc-error"},error),h("div",{className:"ob-sc-dialog-actions"},choices.length?h("button",{className:"ob-sc-primary",type:"submit",disabled:busy||!community},busy?"Сохраняем…":"Подтвердить участие"):h("button",{className:"ob-sc-primary",type:"button",onClick:()=>{setJoining(null);onNavigate("communities")}},"К сообществам"),h("button",{className:"ob-sc-secondary",type:"button",disabled:busy,onClick:()=>setJoining(null)},"Отмена")))))
+    selected&&h("div",{className:"ob-sc-dialog-back",onClick:e=>{if(e.target===e.currentTarget&&!busy)setJoining(null)}},h("section",{className:"ob-sc-dialog",role:"dialog","aria-modal":true,"aria-labelledby":"ob-join-title"},h("h2",{id:"ob-join-title"},leaving?"Выйти из сценария":"Присоединиться к сценарию"),h("p",null,selected.title),h("p",null,leaving?"Выберите участвующее сообщество, которое вы представляете, и подтвердите отзыв участия. Изменение только локальное: сценарий и его результат останутся, даже если участников не останется. Присоединиться снова можно в любой момент. Уведомления не отправляются.":"В прототипе добавим выбранное сообщество к карточке. Это не отправляет приглашение и не открывает доступ к данным."),h("form",{onSubmit:join},choices.length?h("label",null,"Сообщество, которое вы представляете",h("select",{value:community,onChange:e=>setCommunity(e.target.value),required:true,disabled:busy,autoFocus:true},h("option",{value:""},"Выберите сообщество"),choices.map(c=>h("option",{key:c.id,value:c.id},c.name)))):h("p",null,leaving?"Нет участвующих сообществ, которые можно выбрать.":"Все доступные сообщества уже участвуют. Можно сначала добавить другое сообщество."),error&&h("p",{role:"alert",className:"ob-sc-error"},error),h("div",{className:"ob-sc-dialog-actions"},choices.length?h("button",{className:"ob-sc-primary",type:"submit",disabled:busy||!community},busy?"Сохраняем…":leaving?"Подтвердить выход":"Подтвердить участие"):h("button",{className:"ob-sc-primary",type:"button",onClick:()=>{setJoining(null);onNavigate("communities")}},"К сообществам"),h("button",{className:"ob-sc-secondary",type:"button",disabled:busy,onClick:()=>setJoining(null)},"Отмена")))))
   );
 }
